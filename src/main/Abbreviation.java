@@ -1,10 +1,6 @@
 package main;
 
-import java.io.*;
-import java.util.*;
-import java.text.*;
-import java.math.*;
-import java.util.regex.*;
+import java.util.Scanner;
 
 public class Abbreviation {
 
@@ -13,7 +9,7 @@ public class Abbreviation {
 		int T = Integer.parseInt(sc.nextLine());
 		String a, b;
 		char[] aArray;
-
+  
 		int size, index, lastIndex, lastJ,j;
 		outer: for (int i = 0; i < T; i++) {
 			a = sc.nextLine();
