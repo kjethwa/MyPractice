@@ -20,9 +20,7 @@ public class TimeConversion {
         catch (ParseException e) {
             e.printStackTrace();
         }
-        System.out.println(displayFormat.format(date));
-        
+        System.out.println(displayFormat.format(date));   
     }
-
 }
 
