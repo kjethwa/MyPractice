@@ -10,8 +10,9 @@ public class MaxTreeDestroyed {
     public static int row;
     public static int col;
     public static void main(String[] args) {
-       //System.out.println(maxTreeDestroyed(6, 7, 14, "((2,1),(6,6),(4,2),(2,5),(2,6),(2,7),(3,4),(6,1),(6,2),(2,3),(6,3),(6,4),(6,5),(6,7))"));
-        System.out.println(maxTreeDestroyed(6, 7, 4, "((5,1),(4,3),(3,5),(2,7))"));
+       System.out.println(maxTreeDestroyed(6, 7, 14, "((2,1),(6,6),(4,2),(2,5),(2,6),(2,7),(3,4),(6,1),(6,2),(2,3),(6,3),(6,4),(6,5),(6,7))"));
+       // System.out.println(maxTreeDestroyed(6, 7, 4, "((5,1),(4,3),(3,5),(2,7))"));
+        //System.out.println(maxTreeDestroyed(6, 7, 4, "((2,1),(3,3),(4,5),(5,7))"));
     }
     
     public static int maxTreeDestroyed(int input1,int input2,int input3,String input4)
@@ -97,23 +98,24 @@ public class MaxTreeDestroyed {
             if (one[0] < two[0]) {
                 min = one[0];
                 max = two[0];
+                int diffX = max-min;
                 dif = two[1] - one[1];
                 int minY = one[1];
-                while (inGrid(min - Math.abs(dif), minY + dif)) {
-                    if (data[min - Math.abs(dif)][minY + dif])
+                while (inGrid(min - Math.abs(diffX), minY - dif)) {
+                    if (data[min - Math.abs(diffX)][minY - dif])
                         count++;
                     else
                         return 0;
-                    min = min - Math.abs(dif);
-                    minY = minY + dif;
+                    min = min - Math.abs(diffX);
+                    minY = minY - dif;
                 }
                 minY = two[1];
-                while (inGrid(max + Math.abs(dif), minY + dif)) {
-                    if (data[max + Math.abs(dif)][minY + dif])
+                while (inGrid(max + Math.abs(diffX), minY + dif)) {
+                    if (data[max + Math.abs(diffX)][minY + dif])
                         count++;
                     else
                         return 0;
-                    max = max + dif;
+                    max = max + Math.abs(diffX);
                     minY = minY + dif;
                 }
                 
@@ -122,23 +124,24 @@ public class MaxTreeDestroyed {
                 min = two[0];
                 max = one[0];
                 dif = one[1] - two[1];
+                int diffX = max-min;
                 int minY = two[1];
                 
-                while (inGrid(min - Math.abs(dif), minY + dif)) {
-                    if (data[min - Math.abs(dif)][minY + dif])
+                while (inGrid(min - Math.abs(diffX), minY - dif)) {
+                    if (data[min - Math.abs(diffX)][minY - dif])
                         count++;
                     else
                         return 0;
-                    min = min - Math.abs(dif);
-                    minY = minY + dif;
+                    min = min - Math.abs(diffX);
+                    minY = minY - dif;
                 }
                 minY = one[1];
-                while (inGrid(max + Math.abs(dif), minY + dif)) {
-                    if (data[max + Math.abs(dif)][minY + dif])
+                while (inGrid(max + Math.abs(diffX), minY + dif)) {
+                    if (data[max + Math.abs(diffX)][minY + dif])
                         count++;
                     else
                         return 0;
-                    max = max + dif;
+                    max = max + Math.abs(diffX);
                     minY = minY + dif;
                 }
             }
