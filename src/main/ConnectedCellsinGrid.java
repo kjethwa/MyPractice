@@ -29,7 +29,6 @@ public class ConnectedCellsinGrid {
            }
        }
        System.out.println(maxCount);
-
     }
 
     private static int countRegion(int i, int j) {
