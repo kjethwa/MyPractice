@@ -34,5 +34,35 @@ class LIS
         int arr[] = { 10, 22, 9, 33, 21, 50, 41, 60};
             int n = arr.length;
             System.out.println("Length of lis is " + lis( arr, n ) + "\n" );
+            
+            System.out.println(longestIncreasingSubsequence("abcbcbcd"));
+            
+    }
+    
+    public static String longestIncreasingSubsequence(String input1) {
+        int dp[] = new int[input1.length()];
+        int i,j,max = 0;
+        StringBuilder str = new StringBuilder();
+
+         for ( i = 0; i < input1.length(); i++ )
+            dp[i] = 1;
+
+         for ( i = 1; i < input1.length(); i++ )
+            for ( j = 0; j < i; j++ ) 
+                  if (input1.charAt(i) >= input1.charAt(j) && dp[i] < dp[j]+1)
+                      dp[i] = dp[j] + 1;
+
+         for ( i = 0; i < input1.length(); i++ ) {
+            if ( max < dp[i] ) {
+                 max = dp[i];
+                 if (i + 1 < input1.length() && max == dp[i+1] && input1.charAt(i+1) < input1.charAt(i)) {
+                     str.append(input1.charAt(i+1));
+                     i++;
+                 } else {
+                     str.append(input1.charAt(i)); 
+                 }
+            }
+         }
+         return str.toString();
     }
 }
