@@ -1,101 +1,100 @@
 package main;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.TreeSet;
 
 public class GridlandMetro {
+
     public static void main(String[] args) {
+        
         Scanner sc = new Scanner(System.in);
-        int N = sc.nextInt(), M = sc.nextInt(), K = sc.nextInt();
-        Map<Integer,LinkedList<Integer>> map = new HashMap<Integer,LinkedList<Integer>>();
-        int r,c1,c2,count=0;
-        LinkedList<Integer> list;
+        long N = sc.nextLong(), M = sc.nextLong(), K = sc.nextLong();
+        Map<Integer,TreeSet<TrainData>> map = new HashMap<Integer,TreeSet<TrainData>>();
+        int r,c1,c2;
+        long count=0;
+        TreeSet<TrainData> list;
+        TrainData tempTrainData;
         for (int i = 0; i < K; i++) {
+            
             r = sc.nextInt();
             c1 = sc.nextInt();
             c2 = sc.nextInt();
+            tempTrainData = new TrainData((long)c1,(long)c2); 
             if(map.get(r)==null){
-                list = new LinkedList<Integer>();
-                list.add(c1);
-                list.add(c2);
+                list = new TreeSet<TrainData>();
+                list.add(tempTrainData);
                 map.put(r,list);
             }
             else{
                 list = map.get(r);
-                int index = c1istheend(c1,list);
-                if(index!=-1){
-                    list.remove(index);
-                    list.add(index, c2);
-                }
-                else{
-                list.add(c1);
-                list.add(c2);
-                }
-                index = c2isthestart(c2,list);
-                
+                list.add(tempTrainData);
             }
         }
         
-        for (int i = 1; i <= N; i++) {
-            if(map.get(i)==null)
-                count+=M;
-            else{
-                count+=calculateFreeCells(map.get(i),i);
-            }
+        for (Integer i : map.keySet()) {
+            long totalTrainLength = mergeCollidingDistanceAndCalculateTotalDistance(map.get(i));
+            count += M - totalTrainLength;
         }
+        count+=(N - map.keySet().size())*M;
         System.out.println(count);
+        
     }
     
-    private static int c1istheend(int c1, LinkedList<Integer> list) {
-        int size = list.size();
-        for (int i = 0; i < size; i += 2) {
-            if(list.get(i+1)==c1)
-                return i;
-        }
-        return -1;
-    }
-    
-    private static int c2isthestart(int c2, LinkedList<Integer> list) {
-        int size = list.size();
-        for (int i = 0; i < size; i += 2) {
-            if(list.get(i)==c2)
-                return i;
-        }
-        return -1;
-    }
+    private static long mergeCollidingDistanceAndCalculateTotalDistance(TreeSet<TrainData> treeSet) {
+        long start = -1, end = -1, count = 0;
 
-    private static int calculateFreeCells(LinkedList<Integer> list, int r) {
-        int size = list.size();
-        int totallength=0,effectivelength=0;
-        for (int i = 0; i < size; i += 2) {
-            int index = getEffectiveStartDate(list.get(i),list);
-            if(index!=-1){
-                list.remove(index);
-                list.add(index, i);
+        for (TrainData trainData : treeSet) {
+            if (start == -1) {
+                start = trainData.getStart();
+                end = trainData.getEnd();
+            }
+            else{
+                if(trainData.getStart()>end){
+                    count += end - start + 1;
+                    start = trainData.getStart();
+                    end = trainData.getEnd();
+                }
+                else{
+                    if(trainData.getEnd()>end)
+                        end = trainData.getEnd();
+                }
             }
         }
-        return 0;
+        count += end - start + 1;
+        return count;
     }
 
-    private static int getEffectiveStartDate(Integer start, LinkedList<Integer> list) {
-        int size = list.size();
-        for (int i = 0; i < size; i += 2) {
-            if (start >= list.get(i) && start <= list.get(i + 1)){
-                return i + 1;
+    private static class TrainData implements Comparable<TrainData>{
+        private Long start;
+        private Long end;
+        
+        public TrainData(Long start, Long end) {
+            super();
+            this.start = start;
+            this.end = end;
+        }
+        public long getStart() {
+            return start;
+        }
+        public void setStart(Long start) {
+            this.start = start;
+        }
+        public Long getEnd() {
+            return end;
+        }
+        public void setEnd(Long end) {
+            this.end = end;
+        }
+        
+        @Override
+        public int compareTo(TrainData o) {
+            if(this.start.compareTo(o.getStart())==0){
+                return this.end.compareTo(o.getEnd());
             }
+            return this.start.compareTo(o.getStart());
         }
-        return -1;
-    }
-
-    private static boolean isCellFree(LinkedList<Integer> list, int m) {
-        int size = list.size();
-        for (int i = 0; i < size; i += 2) {
-            if (m >= list.get(i) && m <= list.get(i + 1))
-                return false;
-        }
-        return true;
+        
     }
 }
-
