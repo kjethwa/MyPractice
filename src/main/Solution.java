@@ -1,120 +1,125 @@
 package main;
 
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
 public class Solution {
 
-    public static void main(String[] args) {
-        /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution. */
-        
-        Scanner sc = new Scanner(System.in);
-        int n = sc.nextInt();
-        int EXPECTED_COUNT = n/4;
-        String s = sc.next();
-        
-        Map<Character,Integer> charCount = new HashMap<Character,Integer>();
-        charCount.put('A', 0);
-        charCount.put('G', 0);
-        charCount.put('T', 0);
-        charCount.put('C', 0);
-        
-        for (int i = 0; i < n; i++) {
-           charCount.put(s.charAt(i),charCount.get(s.charAt(i))+1);            
-        }
-        
-        char[] stringInChar = s.toCharArray();
-        
-        int minLength=0;
-        Map<Character,Integer> charToBeRemoved = new HashMap<Character,Integer >();
-        Set<Character> characterSet = charCount.keySet();
-        for (Character character : characterSet) {
-            if(charCount.get(character)<EXPECTED_COUNT){
-                minLength+=EXPECTED_COUNT-charCount.get(character);
-            }
-            else if(charCount.get(character)>EXPECTED_COUNT){
-                charToBeRemoved.put(character,charCount.get(character)-EXPECTED_COUNT);
-            }
-        }
-        if(charToBeRemoved.isEmpty()){
-            System.out.println(minLength);
-            return;
-        }
-        Map<Character,Integer> tempCharToBeRemoved = new HashMap<Character,Integer>(charToBeRemoved);
-		Set<Character> charSet = tempCharToBeRemoved.keySet();
+    static boolean visited[];
+    static Map<Integer, Integer> ladderSnakesMap;
+    static int DESTINATION_NODE = 100;
 
-		for (Character character : charSet) {
-			tempCharToBeRemoved.put(character, 0);
-		}
-        
-        int solution=n,j=0,i=0;
-        
-        while(!charToBeRemoved.containsKey(stringInChar[i]))
-        	i++;
-        
-        for(;i<=n-minLength&&j<n;){
-	        	
-        		if(charToBeRemoved.containsKey(stringInChar[j])){
-            		tempCharToBeRemoved.put(stringInChar[j],tempCharToBeRemoved.get(stringInChar[j])+1);
-            	}
-        		if(isSubsetSolution(charToBeRemoved,tempCharToBeRemoved)){
-        			if(j-i+1<solution)
-        				solution = j-i+1;
-        			i = removeLeftChar(i,j,charToBeRemoved,tempCharToBeRemoved,stringInChar,solution);
-        			
-        			while(isSubsetSolution(charToBeRemoved, tempCharToBeRemoved)){
-        				tempCharToBeRemoved.put(stringInChar[j], tempCharToBeRemoved.get(stringInChar[j]) - 1);
-        				j--;
-        				while(!tempCharToBeRemoved.containsKey(stringInChar[j])){
-        					j--;
-        				}
-        			}
-        		}
-        		j++;
+    // Complete the quickestWayUp function below.
+    static int quickestWayUp(int[][] ladders, int[][] snakes) {
+
+        ladderSnakesMap = new HashMap<>();
+        visited = new boolean[101];
+
+        int ladderSize = ladders.length;
+        int snakesSize = snakes.length;
+        for (int i = 0; i < ladderSize; i++) {
+            ladderSnakesMap.put(ladders[i][0], ladders[i][1]);
         }
-        
-        System.out.println(solution); 
-        
+
+        for (int i = 0; i < snakesSize; i++) {
+            ladderSnakesMap.put(snakes[i][0], snakes[i][1]);
+        }
+
+        int steps = BFS();
+
+		return steps == Integer.MAX_VALUE ? -1 : steps;
     }
 
-	
+    private static int BFS() {
+        Queue<Integer> queue = new LinkedList<>();
+        Queue<Integer> queueTemp = new LinkedList<>();
+        queue.add(1);
+        visited[1] = true;
 
-	private static int removeLeftChar(int i,int j,
-			Map<Character, Integer> charToBeRemoved,
-			Map<Character, Integer> tempCharToBeRemoved, char[] stringInChar,int solution) {
-		
-		
-		tempCharToBeRemoved.put(stringInChar[i], tempCharToBeRemoved.get(stringInChar[i]) - 1);
-		i++;
-		while(!tempCharToBeRemoved.containsKey(stringInChar[i])){
-			i++;
-		}
-		
-		
-		return i;
-	}
+        int levelCount = 0;
+        int minSteps = Integer.MAX_VALUE;
 
+        while (!queue.isEmpty()) {
+            int currNode = queue.remove();
+            if (currNode == DESTINATION_NODE && levelCount < minSteps) {
+                minSteps = levelCount;
+            }
 
+            for (int i = 1; i <= 6; i++) {
+                int temp = currNode + i;
+                if (temp <= 100 && !visited[temp]) {
+					if (ladderSnakesMap.get(temp) != null) {
+						if (!visited[ladderSnakesMap.get(temp)]) {
+							queueTemp.add(ladderSnakesMap.get(temp));
+							visited[ladderSnakesMap.get(temp)] = true;
+						}
+                    } else {
+                        queueTemp.add(temp);
+                        visited[temp] = true;
+                    }
 
-	private static boolean isSubsetSolution(Map<Character,Integer> charToBeRemoved,Map<Character,Integer> tempCharToBeRemoved  ) {
-		
-		Set<Character> tempCharSet = tempCharToBeRemoved.keySet();
-		Set<Character> charSet = charToBeRemoved.keySet();
-		
-		for (Character character : charSet) {
-			if(!tempCharSet.contains(character)){
-				return false;
-			}
-			if(tempCharToBeRemoved.get(character)<charToBeRemoved.get(character)){
-				return false;
-			}
-		}
-		
-		return true;
-	}
-    
+                }
+            }
+
+            if (queueTemp.size() > 0 & queue.size() == 0) {
+                queue.addAll(queueTemp);
+                queueTemp.clear();
+                levelCount++;
+            }
+
+        }
+
+        return minSteps;
+    }
+
+    private static final Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) throws IOException {
+        //BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+        int t = scanner.nextInt();
+        scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
+
+        for (int tItr = 0; tItr < t; tItr++) {
+            int n = scanner.nextInt();
+            scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
+
+            int[][] ladders = new int[n][2];
+
+            for (int i = 0; i < n; i++) {
+                String[] laddersRowItems = scanner.nextLine().split(" ");
+                scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
+
+                for (int j = 0; j < 2; j++) {
+                    int laddersItem = Integer.parseInt(laddersRowItems[j]);
+                    ladders[i][j] = laddersItem;
+                }
+            }
+
+            int m = scanner.nextInt();
+            scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
+
+            int[][] snakes = new int[m][2];
+
+            for (int i = 0; i < m; i++) {
+                String[] snakesRowItems = scanner.nextLine().split(" ");
+                scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
+
+                for (int j = 0; j < 2; j++) {
+                    int snakesItem = Integer.parseInt(snakesRowItems[j]);
+                    snakes[i][j] = snakesItem;
+                }
+            }
+
+            int result = quickestWayUp(ladders, snakes);
+
+            System.out.println(result);
+            //bufferedWriter.write(String.valueOf(result));
+            //bufferedWriter.newLine();
+        }
+
+        //bufferedWriter.close();
+
+        scanner.close();
+    }
 }
